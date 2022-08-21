@@ -46,21 +46,27 @@ public class ErrorHandlingMiddleware
         {
             case ValidationException or BadRequestException or ArgumentNullException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
+                problem.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                 problem.Status = (int)HttpStatusCode.BadRequest;
                 problem.Title = error.Message;
                 problem.Detail = error.Message;
+                problem.Instance = context.Request.Path;
                 break;
             case KeyNotFoundException or EntityNotFoundException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
+                problem.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4";
                 problem.Status = (int)HttpStatusCode.NotFound;
                 problem.Title = error.Message;
                 problem.Detail = error.Message;
+                problem.Instance = context.Request.Path;
                 break;
             default:
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                problem.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
                 problem.Status = (int)HttpStatusCode.InternalServerError;
                 problem.Title = error.Message;
                 problem.Detail = error.Message;
+                problem.Instance = context.Request.Path;
                 break;
         }
 
