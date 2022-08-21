@@ -5,6 +5,9 @@ using Infrastructure.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Services;
+using Infrastructure.Authentification;
+using Infrastructure.Services;
 
 namespace Infrastructure;
 
@@ -14,13 +17,16 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            var dasdas = configuration.GetConnectionString(DbConstants.DatabaseSettingsConnectionName);
             options.UseSqlServer(configuration.GetConnectionString(DbConstants.DatabaseSettingsConnectionName),
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
         }, ServiceLifetime.Scoped);
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-        services.AddTransient<ISpecialistProfileRepository, SpecialistProfileRepository>();
+        services.AddScoped<ISpecialistProfileRepository, SpecialistProfileRepository>();
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

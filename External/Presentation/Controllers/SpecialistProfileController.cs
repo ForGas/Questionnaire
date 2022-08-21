@@ -8,6 +8,9 @@ using Application.Core.SpecialistProfiles.Queries.GetAllSpecialistProfile;
 using Application.Core.SpecialistProfiles.Commands.CreateSpecialistProfile;
 using Application.Core.SpecialistProfiles.Commands.UpdateSpecialistProfile;
 using Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
+using System;
 
 namespace Presentation.Controllers;
 
@@ -33,7 +36,7 @@ public sealed class SpecialistProfileController : ApiController
         return Ok(profile);
     }
 
-    [HttpGet]
+    [HttpGet, Authorize]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(PaginatedList<SpecialistProfileResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
