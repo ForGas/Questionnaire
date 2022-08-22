@@ -1,18 +1,20 @@
+using System.Text;
 using Application;
-using HostApp.Configurations;
-using HostApp.Middleware;
+using Presentation;
 using Infrastructure;
-using Infrastructure.Authentification;
+using HostApp.Middleware;
+using HostApp.Configurations;
 using Infrastructure.Data;
+using Infrastructure.Authentification;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Presentation;
-using System.Text;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -28,6 +30,10 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
         options.SuppressModelStateInvalidFilter = true
+        );
+
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
         );
 
     builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -104,6 +110,8 @@ var app = builder.Build();
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseCors("CORS_Policy");
+    app.UseForwardedHeaders();
+    app.UseHangfireDashboard("/hangfire");
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
